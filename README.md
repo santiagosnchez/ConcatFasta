@@ -15,6 +15,8 @@ Upcomming updates will include different output formats (phylip and nexus) and l
 
 Use the `-h` flag for more details:
 
+    
+    python ConcatFasta.py -h
     usage: ConcatFasta.py [-h] [--files [FASTA_FILE [FASTA_FILE ...]]]
                       [--dir [DIR]] [--suffix [SUFFIX]] [--outfile [OUTFILE]]
                       [--part ] [--wrap ]
