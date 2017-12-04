@@ -31,16 +31,20 @@ def main():
     '--wrap', '-w', const=True, nargs="?", type=bool, default=False, metavar="",
     help='sequences will be wrapped every 100 characters.')
     args = parser.parse_args()
-    # read files
-    all_labels=[]
+    # store data in:
+    all_labels = []
     datalist = {}
     datalen = {}
+    # determine the way to read the files
     if args.files is None:
+        # the directory way
         files = listdir(args.dir)
         if args.suffix is not None:
             files = filter(lambda x: args.suffix in x, files)
         for file in files:
+             # read one file at a time, store in dictionary
             datalist[file] = readfasta(args.dir+"/"+file)
+            # exit if file not read
             if datalist[file] == {}:
                 print file+" is not FASTA\n"
                 exit( parser.print_help())
@@ -49,15 +53,20 @@ def main():
                 exit("Sequences are not the same length")
             all_labels.append(datalist[file].keys())
             datalen[file] = alnlen[0]
+        # reduce labels
         all_labels = reduce(lambda x,y: x+y,all_labels)
         all_labels = list(set(all_labels))
         all_labels.sort()
+        # do the concatenation
         catd = catdata(datalist, all_labels, datalen)
+        # write to file
         writefasta(catd, args.outfile, args.wrap)
+        # print status to screen
         print "Your concatenated file is "+args.outfile
         if args.part == True:
             printpartition(datalen, files)
     else:
+        # the files way.. similar to the previous block
         files = map(lambda x: args.dir + "/" + x, args.files)
         for file in files:
             datalist[file] = readfasta(args.dir+"/"+file)
