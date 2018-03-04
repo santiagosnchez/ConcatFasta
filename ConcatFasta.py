@@ -144,7 +144,7 @@ def exportnexus(data, outf):
     o.write("#NEXUS\n\n")
     o.write("Begin DATA;\n")
     o.write("\tDimensions ntax=%s nchar=%s;\n" % (ntax,nchar))
-    o.write("\tFormat Datatype=DNA gap=- missing=?;\nMatrix\n")
+    o.write("\tFormat Datatype=DNA gap=- missing=?;\n\tMatrix\n")
     for i in zip(labels,spaced):
         o.write("\t"+i[1]+data[i[0]]+"\n")
     o.write(";\nEnd;\n")
