@@ -3,6 +3,7 @@
 import argparse
 from sys import exit
 from os import listdir
+from re import match
 
 def main():
     # parse arguments
@@ -34,12 +35,16 @@ def main():
     '--nexus', '-n', const=True, nargs="?", type=bool, default=False, metavar="",
     help='export in NEXUS format.')
     args = parser.parse_args()
+    if (args.dir == '.' and args.files == None):
+        proceed = raw_input("Do you which to run ConcatFasta on all files in the current directory? [y|n]")
+        if proceed == 'n':
+            exit(parser.print_help())
     # store data in:
     all_labels = []
     datalist = {}
     datalen = {}
     if args.nexus and args.outfile == "concat.fasta":
-        args.outfile == "concat.nex"
+        args.outfile = "concat.nex"
     # determine the way to read the files
     if args.files is None:
         # the directory way
@@ -66,15 +71,17 @@ def main():
         catd = catdata(datalist, all_labels, datalen)
         # write to file
         if args.nexus:
-            if (args.outfile == "concat.fasta"):
-                args.outfile == "concat.nex"
             exportnexus(catd, args.outfile)
         else:
             writefasta(catd, args.outfile, args.wrap)
         # print status to screen
         print "Your concatenated file is "+args.outfile
-        if args.part == True:
-            printpartition(datalen, files)
+        if args.part:
+            if args.nexus:
+                partblock(args.outfile, datalen, files)
+                print "Partition block added to NEXUS file"
+            else:
+                printpartition(datalen, files)
     else:
         # the files way.. similar to the previous block
         files = map(lambda x: args.dir + "/" + x, args.files)
@@ -97,8 +104,12 @@ def main():
         else:
             writefasta(catd, args.outfile, args.wrap)
         print "Your concatenated file is "+args.outfile
-        if args.part == True:
-            printpartition(datalen, files)
+        if args.part:
+            if args.nexus:
+                partblock(args.outfile, datalen, files)
+                print "Partition block added to NEXUS file"
+            else:
+                printpartition(datalen, files)
 
 
 def readfasta(file):
@@ -132,7 +143,7 @@ def exportnexus(data, outf):
     o = open(outf,"w")
     o.write("#NEXUS\n\n")
     o.write("Begin DATA;\n")
-    o.write("\tDimensions ntax=%s nchar=%s;\n" % ntax,nchar)
+    o.write("\tDimensions ntax=%s nchar=%s;\n" % (ntax,nchar))
     o.write("\tFormat Datatype=DNA gap=- missing=?;\nMatrix\n")
     for i in zip(labels,spaced):
         o.write("\t"+i[1]+data[i[0]]+"\n")
@@ -157,11 +168,35 @@ def printpartition(seqlen, files):
         print "Not the same number of items"
         exit( parser.print_help() )
     seqlen = map(lambda x: seqlen[x], files)
+    gnames = [ i.split('.')[-2][1:] for i in files ]
+    prev = 1
+    o = open("part.txt", "w")
+    for i in range(len(seqlen)):
+        sumlen = sum(seqlen[0:i+1])
+        L = gnames[i] + " = " + str(prev) + "-" + str(sumlen) + ";"
+        print(L)
+        o.write(L+"\n")
+        prev = sumlen+1
+    o.close()
+
+def partblock(outf, seqlen, files):
+    if len(seqlen) != len(files):
+        print seqlen
+        print files
+        print "Not the same number of items"
+        exit( parser.print_help() )
+    o = open(outf, "a")
+    o.write("\nBegin Sets;\n")
+    gnames = [ i.split('.')[-2][1:] for i in files ]
+    seqlen = map(lambda x: seqlen[x], files)
     prev = 1
     for i in range(len(seqlen)):
         sumlen = sum(seqlen[0:i+1])
-        print files[i] + " = " + str(prev) + "-" + str(sumlen) + ";"
+        o.write("\tcharset " + gnames[i] + " = " + str(prev) + "-" + str(sumlen) + ";\n")
         prev = sumlen+1
+    o.write("\n\tpartition all = "+str(len(gnames))+":"+",".join(gnames)+";\n")
+    o.write("End;\n")
+    o.close()
 
 def wrapseq(seq):
     chunks = []
