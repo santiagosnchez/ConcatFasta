@@ -50,6 +50,9 @@ def main():
         args.outfile = "concat.nex"
     elif args.phylip and args.outfile == "concat.fasta":
         args.outfile = "concat.phy"
+    if args.nexus and args.phylip:
+        print "Pick either NEXUS or PHYLIP formats, but not both"
+        exit(parser.print_help())
     # determine the way to read the files
     if args.files is None:
         # the directory way
