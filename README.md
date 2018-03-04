@@ -5,7 +5,7 @@ This is a Python version of [concat_fasta.pl](https://github.com/santiagosnchez/
 
 Concatenates FASTA files given a suffix present in all target files (e.g. "XXX.fasta"). Labels for the same "taxon" should be the same on all FASTA files, but can be unordered. The number of sequences on each file can also be different. In this case, an empty sequence will be added (e.g. "???.."). It will also print a layout of the partitions to the screen with the "-p/--part" flag. Sequences can be wrapped at 100 characters with the "-w/--wrap" option.
 
-Upcomming updates will include different output formats (phylip and nexus) and label filtering/excluding.
+The program now can export as NEXUS or PHYLIP formats by switching the "--nexus/-n" or "--phylip/-p" arguments.
 
 ## Downloading the program
 
