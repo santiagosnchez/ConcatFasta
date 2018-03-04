@@ -30,11 +30,16 @@ def main():
     parser.add_argument(
     '--wrap', '-w', const=True, nargs="?", type=bool, default=False, metavar="",
     help='sequences will be wrapped every 100 characters.')
+    parser.add_argument(
+    '--nexus', '-n', const=True, nargs="?", type=bool, default=False, metavar="",
+    help='export in NEXUS format.')
     args = parser.parse_args()
     # store data in:
     all_labels = []
     datalist = {}
     datalen = {}
+    if args.nexus and args.outfile == "concat.fasta":
+        args.outfile == "concat.nex"
     # determine the way to read the files
     if args.files is None:
         # the directory way
@@ -60,7 +65,12 @@ def main():
         # do the concatenation
         catd = catdata(datalist, all_labels, datalen)
         # write to file
-        writefasta(catd, args.outfile, args.wrap)
+        if args.nexus:
+            if (args.outfile == "concat.fasta"):
+                args.outfile == "concat.nex"
+            exportnexus(catd, args.outfile)
+        else:
+            writefasta(catd, args.outfile, args.wrap)
         # print status to screen
         print "Your concatenated file is "+args.outfile
         if args.part == True:
@@ -82,7 +92,10 @@ def main():
         all_labels = list(set(all_labels))
         all_labels.sort()
         catd = catdata(datalist, all_labels, datalen)
-        writefasta(catd, args.outfile, args.wrap)
+        if args.nexus:
+            exportnexus(catd, args.outfile)
+        else:
+            writefasta(catd, args.outfile, args.wrap)
         print "Your concatenated file is "+args.outfile
         if args.part == True:
             printpartition(datalen, files)
@@ -110,6 +123,21 @@ def writefasta(catd, outf, wrap):
             o.write(catd[i]+"\n")
     o.close()
 
+def exportnexus(data, outf):
+    labels = data.keys()
+    maxlen = max([ len(i) for i in labels ])
+    spaced = [ i + ' ' * (maxlen - len(i) + 1) for i in labels ]
+    ntax = len(labels)
+    nchar = len(data[labels[0]])
+    o = open(outf,"w")
+    o.write("#NEXUS\n\n")
+    o.write("Begin DATA;\n")
+    o.write("\tDimensions ntax=%s nchar=%s;\n" % ntax,nchar)
+    o.write("\tFormat Datatype=DNA gap=- missing=?;\nMatrix\n")
+    for i in zip(labels,spaced):
+        o.write("\t"+i[1]+data[i[0]]+"\n")
+    o.write(";\nEnd;\n")
+    o.close()
 
 def catdata(data, labels, seqlen):
     cdat = {}
