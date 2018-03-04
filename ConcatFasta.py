@@ -89,25 +89,16 @@ def main():
 
 
 def readfasta(file):
-    from re import match
-    f = open(file, "r")
     data = {}
-    seq = ''
-    head = ''
-    for line in f:
-        line = line.rstrip()
-        if match("^>",line):
-            if len(head) != 0:
-                data[head] = seq
+    with open(file, "r") as f:
+        for line in f:
+            line = line.rstrip()
+            if match("^>",line):
                 head = line[1:]
+                data[head] = ''
             else:
-                head = line[1:]
-            if len(seq) != 0:
-                seq = ''
-        else:
-            seq += line
-    f.close()
-    return data
+                data[head] += line
+        return data
 
 def writefasta(catd, outf, wrap):
     o = open(outf,"w")
