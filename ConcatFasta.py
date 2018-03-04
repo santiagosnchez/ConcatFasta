@@ -26,7 +26,7 @@ def main():
     '--outfile', '-o', default="concat.fasta", nargs="?", type=str,
     help='name for output file (default: %(default)s).')
     parser.add_argument(
-    '--part', '-p', const=True, nargs="?", type=bool, default=False, metavar="",
+    '--part', '-q', const=True, nargs="?", type=bool, default=False, metavar="",
     help='will print a partition table.')
     parser.add_argument(
     '--wrap', '-w', const=True, nargs="?", type=bool, default=False, metavar="",
@@ -34,6 +34,9 @@ def main():
     parser.add_argument(
     '--nexus', '-n', const=True, nargs="?", type=bool, default=False, metavar="",
     help='export in NEXUS format.')
+    parser.add_argument(
+    '--phylip', '-p', const=True, nargs="?", type=bool, default=False, metavar="",
+    help='export in PHYLIP format.')
     args = parser.parse_args()
     if (args.dir == '.' and args.files == None):
         proceed = raw_input("Do you which to run ConcatFasta on all files in the current directory? [y|n]")
@@ -45,6 +48,8 @@ def main():
     datalen = {}
     if args.nexus and args.outfile == "concat.fasta":
         args.outfile = "concat.nex"
+    elif args.phylip and args.outfile == "concat.fasta":
+        args.outfile = "concat.phy"
     # determine the way to read the files
     if args.files is None:
         # the directory way
@@ -72,6 +77,8 @@ def main():
         # write to file
         if args.nexus:
             exportnexus(catd, args.outfile)
+        elif args.phylip:
+            exportphylip(catd, args.outfile)
         else:
             writefasta(catd, args.outfile, args.wrap)
         # print status to screen
@@ -99,11 +106,16 @@ def main():
         all_labels = list(set(all_labels))
         all_labels.sort()
         catd = catdata(datalist, all_labels, datalen)
+        # write to file
         if args.nexus:
             exportnexus(catd, args.outfile)
+        elif args.phylip:
+            exportphylip(catd, args.outfile)
         else:
             writefasta(catd, args.outfile, args.wrap)
+        # print status to screen
         print "Your concatenated file is "+args.outfile
+        # print partitions
         if args.part:
             if args.nexus:
                 partblock(args.outfile, datalen, files)
@@ -111,6 +123,7 @@ def main():
             else:
                 printpartition(datalen, files)
 
+# functions
 
 def readfasta(file):
     data = {}
@@ -148,6 +161,18 @@ def exportnexus(data, outf):
     for i in zip(labels,spaced):
         o.write("\t"+i[1]+data[i[0]]+"\n")
     o.write(";\nEnd;\n")
+    o.close()
+
+def exportphylip(data, outf):
+    labels = data.keys()
+    maxlen = max([ len(i) for i in labels ])
+    spaced = [ i + ' ' * (maxlen - len(i) + 1) for i in labels ]
+    ntax = len(labels)
+    nchar = len(data[labels[0]])
+    o = open(outf,"w")
+    o.write("\t%s %s\n" % (ntax,nchar))
+    for i in zip(labels,spaced):
+        o.write("\t"+i[1]+data[i[0]]+"\n")
     o.close()
 
 def catdata(data, labels, seqlen):
