@@ -26,16 +26,16 @@ def main():
     '--outfile', '-o', default="concat.fasta", nargs="?", type=str,
     help='name for output file (default: %(default)s).')
     parser.add_argument(
-    '--part', '-q', const=True, nargs="?", type=bool, default=False, metavar="",
+    '--part', '-q', action="store_true", default=False,
     help='will print a partition table.')
     parser.add_argument(
-    '--wrap', '-w', const=True, nargs="?", type=bool, default=False, metavar="",
-    help='sequences will be wrapped every 100 characters.')
+    '--wrap', '-w', const=100, nargs="?", type=bool, default=False, metavar="",
+    help='sequences will be wrapped every N characters. (default: 100)')
     parser.add_argument(
-    '--nexus', '-n', const=True, nargs="?", type=bool, default=False, metavar="",
+    '--nexus', '-n', action="store_true", default=False,
     help='export in NEXUS format.')
     parser.add_argument(
-    '--phylip', '-p', const=True, nargs="?", type=bool, default=False, metavar="",
+    '--phylip', '-p', action="store_true", default=False,
     help='export in PHYLIP format.')
     args = parser.parse_args()
     if (args.dir == '.' and args.files == None):
@@ -144,10 +144,10 @@ def writefasta(catd, outf, wrap):
     o = open(outf,"w")
     for i in catd.keys():
         o.write(">"+i+"\n")
-        if wrap == True:
-            o.write(wrapseq(catd[i])+"\n")
-        else:
+        if not wrap:
             o.write(catd[i]+"\n")
+        else:
+            o.write(wrapseq(catd[i], wrap)+"\n")
     o.close()
 
 def exportnexus(data, outf):
@@ -226,9 +226,9 @@ def partblock(outf, seqlen, files):
     o.write("End;\n")
     o.close()
 
-def wrapseq(seq):
+def wrapseq(seq, w):
     chunks = []
-    interval = map(lambda x: x*100, range((len(seq)/100)+2))
+    interval = map(lambda x: x*w, range((len(seq)/w)+2))
     for i in interval:
         if i != interval[-1]:
             chunks.append(seq[i:interval[interval.index(i)+1]-1])
