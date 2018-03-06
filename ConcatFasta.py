@@ -29,7 +29,7 @@ def main():
     '--part', '-q', action="store_true", default=False,
     help='will print a partition table.')
     parser.add_argument(
-    '--wrap', '-w', const=100, nargs="?", type=bool, default=False, metavar="",
+    '--wrap', '-w', const=100, nargs="?", type=bool, default=False, metavar="N",
     help='sequences will be wrapped every N characters. (default: 100)')
     parser.add_argument(
     '--nexus', '-n', action="store_true", default=False,
