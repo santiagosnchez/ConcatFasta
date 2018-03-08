@@ -1,7 +1,6 @@
 # ConcatFasta.py
 
 import argparse
-from sys import exit
 from os import listdir
 from re import match
 
@@ -41,7 +40,7 @@ def main():
     if (args.dir == '.' and args.files == None):
         proceed = raw_input("Do you which to run ConcatFasta on all files in the current directory? [y|n]")
         if proceed == 'n':
-            exit(parser.print_help())
+            parser.error(message="use either --files/-f or --dir/-d")
     # store data in:
     all_labels = []
     datalist = {}
@@ -51,8 +50,7 @@ def main():
     elif args.phylip and args.outfile == "concat.fasta":
         args.outfile = "concat.phy"
     if args.nexus and args.phylip:
-        print "Pick either NEXUS or PHYLIP formats, but not both"
-        exit(parser.print_help())
+        parser.error(message="pick either NEXUS or PHYLIP formats, but not both")
     # determine the way to read the files
     if args.files is None:
         # the directory way
@@ -65,10 +63,10 @@ def main():
             # exit if file not read
             if datalist[file] == {}:
                 print file+" is not FASTA\n"
-                exit( parser.print_help())
+                parser.error(message=file+" is not FASTA")
             alnlen = map(lambda x: len(datalist[file][x]), datalist[file].keys())
             if not all_same(alnlen):
-                exit("Sequences are not the same length")
+                parser.error(message="sequences are not the same length")
             all_labels.append(datalist[file].keys())
             datalen[file] = alnlen[0]
         # reduce labels
@@ -98,11 +96,10 @@ def main():
         for file in files:
             datalist[file] = readfasta(args.dir+"/"+file)
             if datalist[file] == {}:
-                print file+" is not FASTA\n"
-                exit( parser.print_help())
+                parser.error(message=file+" is not FASTA")
             alnlen = map(lambda x: len(datalist[file][x]), datalist[file].keys())
             if not all_same(alnlen):
-                exit("Sequences are not the same length")
+                parser.error(message="sequences are not the same length")
             all_labels.append(datalist[file].keys())
             datalen[file] = alnlen[0]
         all_labels = reduce(lambda x,y: x+y,all_labels)
@@ -193,8 +190,7 @@ def printpartition(seqlen, files):
     if len(seqlen) != len(files):
         print seqlen
         print files
-        print "Not the same number of items"
-        exit( parser.print_help() )
+        parser.error(message="not the same number of items")
     seqlen = map(lambda x: seqlen[x], files)
     gnames = [ i.split('.')[-2][1:] for i in files ]
     prev = 1
@@ -211,8 +207,7 @@ def partblock(outf, seqlen, files):
     if len(seqlen) != len(files):
         print seqlen
         print files
-        print "Not the same number of items"
-        exit( parser.print_help() )
+        parser.error(message="not the same number of items")
     o = open(outf, "a")
     o.write("\nBegin Sets;\n")
     gnames = [ i.split('.')[-2][1:] for i in files ]
