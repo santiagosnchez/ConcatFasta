@@ -74,7 +74,7 @@ def main():
         all_labels = list(set(all_labels))
         all_labels.sort()
         # do the concatenation
-        catd = catdata(datalist, all_labels, datalen)
+        catd = catdata(datalist, all_labels, datalen, files)
         # write to file
         if args.nexus:
             exportnexus(catd, args.outfile)
@@ -105,7 +105,7 @@ def main():
         all_labels = reduce(lambda x,y: x+y,all_labels)
         all_labels = list(set(all_labels))
         all_labels.sort()
-        catd = catdata(datalist, all_labels, datalen)
+        catd = catdata(datalist, all_labels, datalen, files)
         # write to file
         if args.nexus:
             exportnexus(catd, args.outfile)
@@ -175,11 +175,11 @@ def exportphylip(data, outf):
         o.write("\t"+i[1]+data[i[0]]+"\n")
     o.close()
 
-def catdata(data, labels, seqlen):
+def catdata(data, labels, seqlen, files):
     cdat = {}
     for lab in labels:
         cdat[lab] = ''
-        for dat in data.keys():
+        for dat in files:
             if lab in data[dat].keys():
                 cdat[lab] += data[dat][lab]
             else:
@@ -192,7 +192,7 @@ def printpartition(seqlen, files):
         print files
         parser.error(message="not the same number of items")
     seqlen = map(lambda x: seqlen[x], files)
-    gnames = [ i.split('.')[-2][1:] for i in files ]
+    gnames = [ i.split('/')[-1].split(".")[0] for i in files ]
     prev = 1
     o = open("part.txt", "w")
     for i in range(len(seqlen)):
@@ -210,7 +210,7 @@ def partblock(outf, seqlen, files):
         parser.error(message="not the same number of items")
     o = open(outf, "a")
     o.write("\nBegin Sets;\n")
-    gnames = [ i.split('.')[-2][1:] for i in files ]
+    gnames = [ i.split('/')[-1].split(".")[0] for i in files ]
     seqlen = map(lambda x: seqlen[x], files)
     prev = 1
     for i in range(len(seqlen)):
