@@ -1,7 +1,7 @@
 # ConcatFasta.py
 Concatenates FASTA files, imputes dummy sequences, and prints a partition table
 
-This is a Python version of [concat_fasta.pl](https://github.com/santiagosnchez/concat_fasta). Its a more portable and expandable than its Perl counterpart and will be updated more regularly.
+This is a Python version of [concat_fasta.pl](https://github.com/santiagosnchez/concat_fasta). Its a more portable and expandable than its Perl predecessor and will be updated more regularly.
 
 Concatenates FASTA files given a suffix present in all target files (e.g. "XXX.fasta"). Labels for the same "taxon" should be the same on all FASTA files, but can be unordered. The number of sequences on each file can also be different. In this case, an empty sequence will be added (e.g. "???.."). It will also print a layout of the partitions to the screen with the `-p/--part` flag. Sequences can be wrapped at 100 characters with the `-w/--wrap` option.
 
