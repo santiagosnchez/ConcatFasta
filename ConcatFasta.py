@@ -2,7 +2,7 @@
 
 import argparse
 from os import listdir
-from re import match
+from re import match, sub
 
 def main():
     # parse arguments
@@ -192,7 +192,7 @@ def printpartition(seqlen, files):
         print files
         parser.error(message="not the same number of items")
     seqlen = map(lambda x: seqlen[x], files)
-    gnames = [ '.'join(i.split('/')[-1].split(".")[:-2]) for i in files ]
+    gnames = [ sub(".[fF][aA]{0,1}[sS]{0,1}[tT]{0,1}[aA]{0,1}$","",i.split('/')[-1]) for i in files ]
     prev = 1
     o = open("part.txt", "w")
     for i in range(len(seqlen)):
