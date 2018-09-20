@@ -192,7 +192,7 @@ def printpartition(seqlen, files):
         print files
         parser.error(message="not the same number of items")
     seqlen = map(lambda x: seqlen[x], files)
-    gnames = [ i.split('/')[-1].split(".")[0] for i in files ]
+    gnames = [ i.split('/')[-1].split(".")[-2] for i in files ]
     prev = 1
     o = open("part.txt", "w")
     for i in range(len(seqlen)):
