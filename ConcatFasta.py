@@ -1,4 +1,4 @@
-#!/usr/bin/python env
+#!/usr/bin/env python
 # ConcatFasta.py
 
 import argparse
