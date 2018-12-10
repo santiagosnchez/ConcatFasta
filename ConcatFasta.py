@@ -29,6 +29,9 @@ def main():
     '--part', '-q', action="store_true", default=False,
     help='will print a partition table.')
     parser.add_argument(
+    '--silent', action="store_true", default=False,
+    help='will finish without messages.')
+    parser.add_argument(
     '--wrap', '-w', const=100, nargs="?", type=int, default=False, metavar="N",
     help='sequences will be wrapped every N characters. (default: 100)')
     parser.add_argument(
@@ -84,11 +87,13 @@ def main():
         else:
             writefasta(catd, args.outfile, args.wrap)
         # print status to screen
-        print "Your concatenated file is "+args.outfile
+        if not args.silent:
+            print "Your concatenated file is "+args.outfile
         if args.part:
             if args.nexus:
                 partblock(args.outfile, datalen, files)
-                print "Partition block added to NEXUS file"
+                if not args.silent:
+                    print "Partition block added to NEXUS file"
             else:
                 printpartition(datalen, files)
     else:
@@ -115,12 +120,14 @@ def main():
         else:
             writefasta(catd, args.outfile, args.wrap)
         # print status to screen
-        print "Your concatenated file is "+args.outfile
+        if not args.silent:
+            print "Your concatenated file is "+args.outfile
         # print partitions
         if args.part:
             if args.nexus:
                 partblock(args.outfile, datalen, files)
-                print "Partition block added to NEXUS file"
+                if not args.silent:
+                    print "Partition block added to NEXUS file"
             else:
                 printpartition(datalen, files)
 
