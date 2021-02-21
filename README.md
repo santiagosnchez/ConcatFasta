@@ -1,4 +1,7 @@
 # ConcatFasta.py
+
+**note**: `ConcatFasta` has now been updated for Python3
+
 Concatenates FASTA files, imputes dummy sequences, and prints a partition table
 
 This is a Python version of [concat_fasta.pl](https://github.com/santiagosnchez/concat_fasta). It is more portable and expandable than its Perl predecessor and will be updated more regularly.
