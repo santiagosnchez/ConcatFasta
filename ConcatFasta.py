@@ -73,7 +73,8 @@ def main():
             files = filter(lambda x: args.suffix in x, files)
         for file in files:
             # read one file at a time, store in dictionary
-            print("Reading: ", file, "\r", end='', flush=True)
+            if not args.silent:
+                print("Reading: ", file, "\r", end='', flush=True)
             datalist[file] = readfasta(args.dir+"/"+file, args.delim)
             # exit if file not read
             if datalist[file] == {}:
@@ -85,19 +86,24 @@ def main():
             for head in datalist[file].keys(): all_labels[head] = '' 
             #all_labels.append(list(datalist[file].keys()))
             datalen[file] = alnlen[0]
-        print("\nDone reading files.")
+        if not args.silent:
+            print("\nDone reading files.")
         # reduce labels
         #all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         #all_labels = list(set(all_labels))
         all_labels = list(all_labels.keys())
-        print("Sorting ",len(all_labels), " labels ... ", end='')
+        if not args.silent:
+            print("Sorting ",len(all_labels), " labels ... ", end='')
         all_labels.sort()
-        print("Done.")
+        if not args.silent:
+            print("Done.")
         # do the concatenation
-        print("Preparing concatenation ... ", end='')
+        if not args.silent:
+            print("Preparing concatenation ... ", end='')
         catd = catdata(datalist, all_labels, datalen, files, args.missing_character)
-        print("Done.")
+        if not args.silent:
+            print("Done.")
         # write to file
         if args.nexus:
             exportnexus(catd, args.outfile)
@@ -119,7 +125,8 @@ def main():
         # the files way.. similar to the previous block
         files = list(map(lambda x: args.dir + "/" + x, args.files))
         for file in files:
-            print("Reading: ", file, "\r", end='', flush=True)
+            if not args.silent:
+                print("Reading: ", file, "\r", end='', flush=True)
             datalist[file] = readfasta(args.dir+"/"+file, args.delim)
             if datalist[file] == {}:
                 parser.error(message=file+" is not FASTA")
@@ -129,18 +136,23 @@ def main():
             for head in datalist[file].keys(): all_labels[head] = ''
             #all_labels.append(list(datalist[file].keys()))
             datalen[file] = alnlen[0]
-        print("\nDone reading files.")
+        if not args.silent:
+            print("\nDone reading files.")
         #all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         #all_labels = list(set(all_labels))
         all_labels = list(all_labels.keys())
-        print("Sorting",len(all_labels), "labels ... ", end='')
+        if not args.silent:
+            print("Sorting",len(all_labels), "labels ... ", end='')
         all_labels.sort()
-        print("Done.")
+        if not args.silent:
+            print("Done.")
         # do concatenation
-        print("Preparing concatenation ... ", end='')
+        if not args.silent:
+            print("Preparing concatenation ... ", end='')
         catd = catdata(datalist, all_labels, datalen, files, args.missing_character)
-        print("Done.")
+        if not args.silent:
+            print("Done.")
         # write to file
         if args.nexus:
             exportnexus(catd, args.outfile)
