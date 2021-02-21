@@ -73,7 +73,7 @@ def main():
             files = filter(lambda x: args.suffix in x, files)
         for file in files:
             # read one file at a time, store in dictionary
-            print("\r", "Reading: ", file, "         ", end='', flush=True)
+            print("Reading: ", file, "\r", end='', flush=True)
             datalist[file] = readfasta(args.dir+"/"+file, args.delim)
             # exit if file not read
             if datalist[file] == {}:
@@ -91,7 +91,7 @@ def main():
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         #all_labels = list(set(all_labels))
         all_labels = list(all_labels.keys())
-        print("Soring ",len(all_labels), " labels ... ", end='')
+        print("Sorting ",len(all_labels), " labels ... ", end='')
         all_labels.sort()
         print("Done.")
         # do the concatenation
@@ -119,7 +119,7 @@ def main():
         # the files way.. similar to the previous block
         files = list(map(lambda x: args.dir + "/" + x, args.files))
         for file in files:
-            print("\r", "Reading: ", file, "         ", end='', flush=True)
+            print("Reading: ", file, "\r", end='', flush=True)
             datalist[file] = readfasta(args.dir+"/"+file, args.delim)
             if datalist[file] == {}:
                 parser.error(message=file+" is not FASTA")
@@ -134,7 +134,7 @@ def main():
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         #all_labels = list(set(all_labels))
         all_labels = list(all_labels.keys())
-        print("Soring ",len(all_labels), " labels ... ", end='')
+        print("Sorting",len(all_labels), "labels ... ", end='')
         all_labels.sort()
         print("Done.")
         # do concatenation
