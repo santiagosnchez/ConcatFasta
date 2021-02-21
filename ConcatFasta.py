@@ -266,7 +266,7 @@ def partblock(outf, seqlen, files):
 
 def wrapseq(seq, w):
     chunks = []
-    interval = list(map(lambda x: x*w, range((len(seq)/w)+2)))
+    interval = list(map(lambda x: x*w, range((int(len(seq)/w))+2)))
     for i in interval:
         if i != interval[-1]:
             chunks.append(seq[i:interval[interval.index(i)+1]-1])
