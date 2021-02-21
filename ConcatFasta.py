@@ -53,7 +53,7 @@ def main():
         if proceed == 'n':
             parser.error(message="use either --files/-f or --dir/-d")
     # store data in:
-    all_labels = []
+    all_labels = {}
     datalist = {}
     datalen = {}
     if args.nexus and args.outfile == "concat.fasta":
@@ -79,14 +79,18 @@ def main():
             alnlen = list(map(lambda x: len(datalist[file][x]), datalist[file].keys()))
             if not all_same(alnlen):
                 parser.error(message="sequences are not the same length")
-            all_labels.append(list(datalist[file].keys()))
+            for head in datalist[file].keys(): all_labels[head] = '' 
+            #all_labels.append(list(datalist[file].keys()))
             datalen[file] = alnlen[0]
         print("\nDone reading files.")
         # reduce labels
-        all_labels = sum(all_labels, [])
+        #all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
-        all_labels = list(set(all_labels))
+        #all_labels = list(set(all_labels))
+        all_lables = list(all_labels.keys())
+        print("Soring ",len(all_labels), " labels ... ", end='')
         all_labels.sort()
+        print("Done.")
         # do the concatenation
         print("Preparing concatenation ... ", end='')
         catd = catdata(datalist, all_labels, datalen, files, args.missing_character)
@@ -119,13 +123,17 @@ def main():
             alnlen = list(map(lambda x: len(datalist[file][x]), datalist[file].keys()))
             if not all_same(alnlen):
                 parser.error(message="sequences are not the same length")
-            all_labels.append(list(datalist[file].keys()))
+            for head in datalist[file].keys(): all_labels[head] = ''
+            #all_labels.append(list(datalist[file].keys()))
             datalen[file] = alnlen[0]
         print("\nDone reading files.")
-        all_labels = sum(all_labels, [])
+        #all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
-        all_labels = list(set(all_labels))
+        #all_labels = list(set(all_labels))
+        all_lables = list(all_labels.keys())
+        print("Soring ",len(all_labels), " labels ... ", end='')
         all_labels.sort()
+        print("Done.")
         # do concatenation
         print("Preparing concatenation ... ", end='')
         catd = catdata(datalist, all_labels, datalen, files, args.missing_character)
