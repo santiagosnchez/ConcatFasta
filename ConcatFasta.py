@@ -2,8 +2,8 @@
 # ConcatFasta.py
 
 import argparse
-from os import listdir
-from re import match, sub
+import os
+import re
 
 def main():
     # parse arguments
@@ -26,6 +26,9 @@ def main():
     '--outfile', '-o', default="concat.fasta", nargs="?", type=str,
     help='name for output file (default: %(default)s).')
     parser.add_argument(
+    '--missing_character', '-mc', default="?", nargs="?", type=str,
+    help='character used for missing data (default: %(default)s).')
+    parser.add_argument(
     '--part', '-q', action="store_true", default=False,
     help='will print a partition table.')
     parser.add_argument(
@@ -40,6 +43,10 @@ def main():
     parser.add_argument(
     '--phylip', '-p', action="store_true", default=False,
     help='export in PHYLIP format.')
+    
+    # Welcome message
+    print("ConcatFasta v2.0")
+    
     args = parser.parse_args()
     if (args.dir == '.' and args.files == None):
         proceed = input("Do you which to run ConcatFasta on all files in the current directory? [y|n]")
@@ -58,11 +65,12 @@ def main():
     # determine the way to read the files
     if args.files is None:
         # the directory way
-        files = listdir(args.dir)
+        files = os.listdir(args.dir)
         if args.suffix is not None:
             files = filter(lambda x: args.suffix in x, files)
         for file in files:
-             # read one file at a time, store in dictionary
+            # read one file at a time, store in dictionary
+            print("\r", "Reading: ", file, end='', flush=True)
             datalist[file] = readfasta(args.dir+"/"+file)
             # exit if file not read
             if datalist[file] == {}:
@@ -73,13 +81,14 @@ def main():
                 parser.error(message="sequences are not the same length")
             all_labels.append(datalist[file].keys())
             datalen[file] = alnlen[0]
+        print("Done reading files.)
         # reduce labels
         all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         all_labels = list(set(all_labels))
         all_labels.sort()
         # do the concatenation
-        catd = catdata(datalist, all_labels, datalen, files)
+        catd = catdata(datalist, all_labels, datalen, files, args.missing_character)
         # write to file
         if args.nexus:
             exportnexus(catd, args.outfile)
@@ -113,7 +122,7 @@ def main():
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         all_labels = list(set(all_labels))
         all_labels.sort()
-        catd = catdata(datalist, all_labels, datalen, files)
+        catd = catdata(datalist, all_labels, datalen, files, args.missing_character)
         # write to file
         if args.nexus:
             exportnexus(catd, args.outfile)
@@ -140,7 +149,7 @@ def readfasta(file):
     with open(file, "r") as f:
         for line in f:
             line = line.rstrip()
-            if match("^>",line):
+            if line[0] == ">":
                 head = line[1:]
                 data[head] = ''
             else:
@@ -182,7 +191,7 @@ def exportphylip(data, outf):
         for i in zip(labels,spaced):
             o.write("\t"+i[1]+data[i[0]]+"\n")
 
-def catdata(data, labels, seqlen, files):
+def catdata(data, labels, seqlen, files, mc):
     cdat = {}
     for lab in labels:
         cdat[lab] = ''
@@ -190,7 +199,7 @@ def catdata(data, labels, seqlen, files):
             if lab in data[dat].keys():
                 cdat[lab] += data[dat][lab]
             else:
-                cdat[lab] += '?' * seqlen[dat]
+                cdat[lab] += mc * seqlen[dat]
     return cdat
 
 def printpartition(seqlen, files):
@@ -199,7 +208,7 @@ def printpartition(seqlen, files):
         print(files)
         parser.error(message="not the same number of items")
     seqlen = list(map(lambda x: seqlen[x], files))
-    gnames = [ sub(".[fF][aA]{0,1}[sS]{0,1}[tT]{0,1}[aA]{0,1}$","",i.split('/')[-1]) for i in files ]
+    gnames = [ re.sub(".[fF][aA]{0,1}[sS]{0,1}[tT]{0,1}[aA]{0,1}$","",i.split('/')[-1]) for i in files ]
     prev = 1
     with open("part.txt", "w") as o:
         for i in range(len(seqlen)):
