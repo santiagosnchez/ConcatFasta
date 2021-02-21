@@ -88,7 +88,9 @@ def main():
         all_labels = list(set(all_labels))
         all_labels.sort()
         # do the concatenation
+        print("Preparing concatenation ... ", end='')
         catd = catdata(datalist, all_labels, datalen, files, args.missing_character)
+        print("Done.")
         # write to file
         if args.nexus:
             exportnexus(catd, args.outfile)
@@ -124,7 +126,10 @@ def main():
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         all_labels = list(set(all_labels))
         all_labels.sort()
+        # do concatenation
+        print("Preparing concatenation ... ", end='')
         catd = catdata(datalist, all_labels, datalen, files, args.missing_character)
+        print("Done.")
         # write to file
         if args.nexus:
             exportnexus(catd, args.outfile)
