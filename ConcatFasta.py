@@ -17,7 +17,7 @@ def main():
     '--files', '-f', metavar='FASTA_FILE', nargs="*", type=str,
     help='file to concatenate in FASTA format.')
     parser.add_argument(
-    '--dir', '-d', nargs="?", default=".", type=str,
+    '--dir', '-D', nargs="?", default=".", type=str,
     help='directory where FASTA files to concatenate are (default: %(default)s).')
     parser.add_argument(
     '--suffix', '-s', nargs="?", type=str,
@@ -28,6 +28,9 @@ def main():
     parser.add_argument(
     '--missing_character', '-mc', default="?", nargs="?", type=str,
     help='character used for missing data (default: %(default)s).')
+    parser.add_argument(
+    '--delim', '-d', nargs="?", type=str,
+    help='use delimiter to split FASTA header. The first element will be kept.')
     parser.add_argument(
     '--part', '-q', action="store_true", default=False,
     help='will print a partition table.')
@@ -71,7 +74,7 @@ def main():
         for file in files:
             # read one file at a time, store in dictionary
             print("\r", "Reading: ", file, end='', flush=True)
-            datalist[file] = readfasta(args.dir+"/"+file)
+            datalist[file] = readfasta(args.dir+"/"+file, args.delim)
             # exit if file not read
             if datalist[file] == {}:
                 print(file+" is not FASTA")
@@ -87,7 +90,7 @@ def main():
         #all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         #all_labels = list(set(all_labels))
-        all_lables = list(all_labels.keys())
+        all_labels = list(all_labels.keys())
         print("Soring ",len(all_labels), " labels ... ", end='')
         all_labels.sort()
         print("Done.")
@@ -117,7 +120,7 @@ def main():
         files = list(map(lambda x: args.dir + "/" + x, args.files))
         for file in files:
             print("\r", "Reading: ", file, end='', flush=True)
-            datalist[file] = readfasta(args.dir+"/"+file)
+            datalist[file] = readfasta(args.dir+"/"+file, args.delim)
             if datalist[file] == {}:
                 parser.error(message=file+" is not FASTA")
             alnlen = list(map(lambda x: len(datalist[file][x]), datalist[file].keys()))
@@ -130,7 +133,7 @@ def main():
         #all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         #all_labels = list(set(all_labels))
-        all_lables = list(all_labels.keys())
+        all_labels = list(all_labels.keys())
         print("Soring ",len(all_labels), " labels ... ", end='')
         all_labels.sort()
         print("Done.")
@@ -159,17 +162,28 @@ def main():
 
 # functions
 
-def readfasta(file):
+def readfasta(file, delim):
     data = {}
-    with open(file, "r") as f:
-        for line in f:
-            line = line.rstrip()
-            if line[0] == ">":
-                head = line[1:]
-                data[head] = ''
-            else:
-                data[head] += line
-        return data
+    if delim:
+        with open(file, "r") as f:
+            for line in f:
+                line = line.rstrip()
+                if line[0] == ">":
+                    head = line[1:]
+                    data[head.split(delim)[0]] = ''
+                else:
+                    data[head.split(delim)[0]] += line
+            return data
+    else:
+        with open(file, "r") as f:
+            for line in f:
+                line = line.rstrip()
+                if line[0] == ">":
+                    head = line[1:]
+                    data[head] = ''
+                else:
+                    data[head] += line
+            return data
 
 def writefasta(catd, outf, wrap):
     with open(outf,"w") as o:
