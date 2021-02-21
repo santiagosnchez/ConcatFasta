@@ -74,7 +74,8 @@ def main():
             all_labels.append(datalist[file].keys())
             datalen[file] = alnlen[0]
         # reduce labels
-        all_labels = reduce(lambda x,y: x+y,all_labels)
+        all_labels = sum(all_labels, [])
+        #all_labels = reduce(lambda x,y: x+y,all_labels)
         all_labels = list(set(all_labels))
         all_labels.sort()
         # do the concatenation
@@ -86,11 +87,7 @@ def main():
             exportphylip(catd, args.outfile)
         else:
             writefasta(catd, args.outfile, args.wrap)
-        # 
-        
-        
-        
-        status to screen
+        # status to screen
         if not args.silent:
             print("Your concatenated file is "+args.outfile)
         if args.part:
@@ -166,7 +163,7 @@ def exportnexus(data, outf):
     ntax = len(labels)
     nchar = len(data[labels[0]])
     with open(outf,"w") as o:
-    o.write("#NEXUS\n\n")
+        o.write("#NEXUS\n\n")
         o.write("Begin DATA;\n")
         o.write("\tDimensions ntax=%s nchar=%s;\n" % (ntax,nchar))
         o.write("\tFormat Datatype=DNA gap=- missing=?;\n\tMatrix\n")
@@ -218,7 +215,7 @@ def partblock(outf, seqlen, files):
         print(files)
         parser.error(message="not the same number of items")
     with open(outf, "a") as o:
-    o.write("\nBegin Sets;\n")
+        o.write("\nBegin Sets;\n")
         gnames = [ i.split('/')[-1].split(".")[0] for i in files ]
         seqlen = list(map(lambda x: seqlen[x], files))
         prev = 1
