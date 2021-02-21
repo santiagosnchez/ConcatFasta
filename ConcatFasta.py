@@ -110,6 +110,7 @@ def main():
         # the files way.. similar to the previous block
         files = list(map(lambda x: args.dir + "/" + x, args.files))
         for file in files:
+            print("\r", "Reading: ", file, end='', flush=True)
             datalist[file] = readfasta(args.dir+"/"+file)
             if datalist[file] == {}:
                 parser.error(message=file+" is not FASTA")
@@ -118,6 +119,7 @@ def main():
                 parser.error(message="sequences are not the same length")
             all_labels.append(list(datalist[file].keys()))
             datalen[file] = alnlen[0]
+        print("Done reading files.")
         all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         all_labels = list(set(all_labels))
