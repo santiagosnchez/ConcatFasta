@@ -71,7 +71,7 @@ def main():
             alnlen = list(map(lambda x: len(datalist[file][x]), datalist[file].keys()))
             if not all_same(alnlen):
                 parser.error(message="sequences are not the same length")
-            all_labels.append(datalist[file].keys())
+            all_labels.append(list(datalist[file].keys()))
             datalen[file] = alnlen[0]
         # reduce labels
         all_labels = sum(all_labels, [])
@@ -107,7 +107,7 @@ def main():
             alnlen = list(map(lambda x: len(datalist[file][x]), datalist[file].keys()))
             if not all_same(alnlen):
                 parser.error(message="sequences are not the same length")
-            all_labels.append(datalist[file].keys())
+            all_labels.append(list(datalist[file].keys()))
             datalen[file] = alnlen[0]
         all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
