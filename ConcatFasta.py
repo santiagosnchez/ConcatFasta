@@ -81,7 +81,7 @@ def main():
                 parser.error(message="sequences are not the same length")
             all_labels.append(list(datalist[file].keys()))
             datalen[file] = alnlen[0]
-        print("Done reading files.")
+        print("\nDone reading files.")
         # reduce labels
         all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
@@ -119,7 +119,7 @@ def main():
                 parser.error(message="sequences are not the same length")
             all_labels.append(list(datalist[file].keys()))
             datalen[file] = alnlen[0]
-        print("Done reading files.")
+        print("\nDone reading files.")
         all_labels = sum(all_labels, [])
         #all_labels = reduce(lambda x,y: x+y,all_labels)
         all_labels = list(set(all_labels))
