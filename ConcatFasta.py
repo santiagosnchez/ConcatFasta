@@ -42,7 +42,7 @@ def main():
     help='export in PHYLIP format.')
     args = parser.parse_args()
     if (args.dir == '.' and args.files == None):
-        proceed = raw_input("Do you which to run ConcatFasta on all files in the current directory? [y|n]")
+        proceed = input("Do you which to run ConcatFasta on all files in the current directory? [y|n]")
         if proceed == 'n':
             parser.error(message="use either --files/-f or --dir/-d")
     # store data in:
@@ -66,9 +66,9 @@ def main():
             datalist[file] = readfasta(args.dir+"/"+file)
             # exit if file not read
             if datalist[file] == {}:
-                print file+" is not FASTA\n"
+                print(file+" is not FASTA")
                 parser.error(message=file+" is not FASTA")
-            alnlen = map(lambda x: len(datalist[file][x]), datalist[file].keys())
+            alnlen = list(map(lambda x: len(datalist[file][x]), datalist[file].keys()))
             if not all_same(alnlen):
                 parser.error(message="sequences are not the same length")
             all_labels.append(datalist[file].keys())
@@ -86,29 +86,34 @@ def main():
             exportphylip(catd, args.outfile)
         else:
             writefasta(catd, args.outfile, args.wrap)
-        # print status to screen
+        # 
+        
+        
+        
+        status to screen
         if not args.silent:
-            print "Your concatenated file is "+args.outfile
+            print("Your concatenated file is "+args.outfile)
         if args.part:
             if args.nexus:
                 partblock(args.outfile, datalen, files)
                 if not args.silent:
-                    print "Partition block added to NEXUS file"
+                    print("Partition block added to NEXUS file")
             else:
                 printpartition(datalen, files)
     else:
         # the files way.. similar to the previous block
-        files = map(lambda x: args.dir + "/" + x, args.files)
+        files = list(map(lambda x: args.dir + "/" + x, args.files))
         for file in files:
             datalist[file] = readfasta(args.dir+"/"+file)
             if datalist[file] == {}:
                 parser.error(message=file+" is not FASTA")
-            alnlen = map(lambda x: len(datalist[file][x]), datalist[file].keys())
+            alnlen = list(map(lambda x: len(datalist[file][x]), datalist[file].keys()))
             if not all_same(alnlen):
                 parser.error(message="sequences are not the same length")
             all_labels.append(datalist[file].keys())
             datalen[file] = alnlen[0]
-        all_labels = reduce(lambda x,y: x+y,all_labels)
+        all_labels = sum(all_labels, [])
+        #all_labels = reduce(lambda x,y: x+y,all_labels)
         all_labels = list(set(all_labels))
         all_labels.sort()
         catd = catdata(datalist, all_labels, datalen, files)
@@ -121,13 +126,13 @@ def main():
             writefasta(catd, args.outfile, args.wrap)
         # print status to screen
         if not args.silent:
-            print "Your concatenated file is "+args.outfile
+            print("Your concatenated file is "+args.outfile)
         # print partitions
         if args.part:
             if args.nexus:
                 partblock(args.outfile, datalen, files)
                 if not args.silent:
-                    print "Partition block added to NEXUS file"
+                    print("Partition block added to NEXUS file")
             else:
                 printpartition(datalen, files)
 
@@ -146,42 +151,39 @@ def readfasta(file):
         return data
 
 def writefasta(catd, outf, wrap):
-    o = open(outf,"w")
-    for i in catd.keys():
-        o.write(">"+i+"\n")
-        if not wrap:
-            o.write(catd[i]+"\n")
-        else:
-            o.write(wrapseq(catd[i], wrap)+"\n")
-    o.close()
+    with open(outf,"w") as o:
+        for i in catd.keys():
+            o.write(">"+i+"\n")
+            if not wrap:
+                o.write(catd[i]+"\n")
+            else:
+                o.write(wrapseq(catd[i], wrap)+"\n")
 
 def exportnexus(data, outf):
-    labels = data.keys()
+    labels = list(data.keys())
     maxlen = max([ len(i) for i in labels ])
     spaced = [ i + ' ' * (maxlen - len(i) + 1) for i in labels ]
     ntax = len(labels)
     nchar = len(data[labels[0]])
-    o = open(outf,"w")
+    with open(outf,"w") as o:
     o.write("#NEXUS\n\n")
-    o.write("Begin DATA;\n")
-    o.write("\tDimensions ntax=%s nchar=%s;\n" % (ntax,nchar))
-    o.write("\tFormat Datatype=DNA gap=- missing=?;\n\tMatrix\n")
-    for i in zip(labels,spaced):
-        o.write("\t"+i[1]+data[i[0]]+"\n")
-    o.write(";\nEnd;\n")
-    o.close()
+        o.write("Begin DATA;\n")
+        o.write("\tDimensions ntax=%s nchar=%s;\n" % (ntax,nchar))
+        o.write("\tFormat Datatype=DNA gap=- missing=?;\n\tMatrix\n")
+        for i in zip(labels,spaced):
+            o.write("\t"+i[1]+data[i[0]]+"\n")
+        o.write(";\nEnd;\n")
 
 def exportphylip(data, outf):
-    labels = data.keys()
+    labels = list(data.keys())
     maxlen = max([ len(i) for i in labels ])
     spaced = [ i + ' ' * (maxlen - len(i) + 1) for i in labels ]
     ntax = len(labels)
     nchar = len(data[labels[0]])
-    o = open(outf,"w")
-    o.write("\t%s %s\n" % (ntax,nchar))
-    for i in zip(labels,spaced):
-        o.write("\t"+i[1]+data[i[0]]+"\n")
-    o.close()
+    with open(outf,"w") as o:
+        o.write(f"\t{r} {r}\n" % (ntax,nchar))
+        for i in zip(labels,spaced):
+            o.write("\t"+i[1]+data[i[0]]+"\n")
 
 def catdata(data, labels, seqlen, files):
     cdat = {}
@@ -196,50 +198,47 @@ def catdata(data, labels, seqlen, files):
 
 def printpartition(seqlen, files):
     if len(seqlen) != len(files):
-        print seqlen
-        print files
+        print(seqlen)
+        print(files)
         parser.error(message="not the same number of items")
-    seqlen = map(lambda x: seqlen[x], files)
+    seqlen = list(map(lambda x: seqlen[x], files))
     gnames = [ sub(".[fF][aA]{0,1}[sS]{0,1}[tT]{0,1}[aA]{0,1}$","",i.split('/')[-1]) for i in files ]
     prev = 1
-    o = open("part.txt", "w")
-    for i in range(len(seqlen)):
-        sumlen = sum(seqlen[0:i+1])
-        L = gnames[i] + " = " + str(prev) + "-" + str(sumlen) + ";"
-        print(L)
-        o.write(L+"\n")
-        prev = sumlen+1
-    o.close()
+    with open("part.txt", "w") as o:
+        for i in range(len(seqlen)):
+            sumlen = sum(seqlen[0:i+1])
+            L = gnames[i] + " = " + str(prev) + "-" + str(sumlen) + ";"
+            print(L)
+            o.write(L+"\n")
+            prev = sumlen+1
 
 def partblock(outf, seqlen, files):
     if len(seqlen) != len(files):
-        print seqlen
-        print files
+        print(seqlen)
+        print(files)
         parser.error(message="not the same number of items")
-    o = open(outf, "a")
+    with open(outf, "a") as o:
     o.write("\nBegin Sets;\n")
-    gnames = [ i.split('/')[-1].split(".")[0] for i in files ]
-    seqlen = map(lambda x: seqlen[x], files)
-    prev = 1
-    for i in range(len(seqlen)):
-        sumlen = sum(seqlen[0:i+1])
-        o.write("\tcharset " + gnames[i] + " = " + str(prev) + "-" + str(sumlen) + ";\n")
-        prev = sumlen+1
-    o.write("\n\tpartition all = "+str(len(gnames))+":"+",".join(gnames)+";\n")
-    o.write("End;\n")
-    o.close()
+        gnames = [ i.split('/')[-1].split(".")[0] for i in files ]
+        seqlen = list(map(lambda x: seqlen[x], files))
+        prev = 1
+        for i in range(len(seqlen)):
+            sumlen = sum(seqlen[0:i+1])
+            o.write("\tcharset " + gnames[i] + " = " + str(prev) + "-" + str(sumlen) + ";\n")
+            prev = sumlen+1
+        o.write("\n\tpartition all = "+str(len(gnames))+":"+",".join(gnames)+";\n")
+        o.write("End;\n")
 
 def wrapseq(seq, w):
     chunks = []
-    interval = map(lambda x: x*w, range((len(seq)/w)+2))
+    interval = list(map(lambda x: x*w, range((len(seq)/w)+2)))
     for i in interval:
         if i != interval[-1]:
             chunks.append(seq[i:interval[interval.index(i)+1]-1])
-    return("\n".join(chunks))
+    return "\n".join(chunks)
 
 def all_same(items):
     return all(x == items[0] for x in items)
-
 
 if __name__ == '__main__':
     main()
