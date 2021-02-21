@@ -73,7 +73,7 @@ def main():
             files = filter(lambda x: args.suffix in x, files)
         for file in files:
             # read one file at a time, store in dictionary
-            print("\r", "Reading: ", file, end='', flush=True)
+            print("\r", "Reading: ", file, "         ", end='', flush=True)
             datalist[file] = readfasta(args.dir+"/"+file, args.delim)
             # exit if file not read
             if datalist[file] == {}:
@@ -119,7 +119,7 @@ def main():
         # the files way.. similar to the previous block
         files = list(map(lambda x: args.dir + "/" + x, args.files))
         for file in files:
-            print("\r", "Reading: ", file, end='', flush=True)
+            print("\r", "Reading: ", file, "         ", end='', flush=True)
             datalist[file] = readfasta(args.dir+"/"+file, args.delim)
             if datalist[file] == {}:
                 parser.error(message=file+" is not FASTA")
