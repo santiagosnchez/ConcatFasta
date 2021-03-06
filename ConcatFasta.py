@@ -215,7 +215,7 @@ def exportnexus(data, outf):
     with open(outf,"w") as o:
         o.write("#NEXUS\n\n")
         o.write("Begin DATA;\n")
-        o.write("\tDimensions ntax=%s nchar=%s;\n" % (ntax,nchar))
+        o.write(f"\tDimensions ntax={ntax} nchar={nchar};\n")
         o.write("\tFormat Datatype=DNA gap=- missing=?;\n\tMatrix\n")
         for i in zip(labels,spaced):
             o.write("\t"+i[1]+data[i[0]]+"\n")
@@ -228,7 +228,7 @@ def exportphylip(data, outf):
     ntax = len(labels)
     nchar = len(data[labels[0]])
     with open(outf,"w") as o:
-        o.write(f"\t{ntax} {nchar}\n" % (ntax,nchar))
+        o.write(f"\t{ntax} {nchar}\n")
         for i in zip(labels,spaced):
             o.write("\t"+i[1]+data[i[0]]+"\n")
 
