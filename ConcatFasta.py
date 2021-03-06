@@ -228,7 +228,7 @@ def exportphylip(data, outf):
     ntax = len(labels)
     nchar = len(data[labels[0]])
     with open(outf,"w") as o:
-        o.write(f"\t{} {}\n" % (ntax,nchar))
+        o.write(f"\t{ntax} {nchar}\n" % (ntax,nchar))
         for i in zip(labels,spaced):
             o.write("\t"+i[1]+data[i[0]]+"\n")
 
