@@ -46,10 +46,10 @@ def main():
     parser.add_argument(
     '--phylip', '-p', action="store_true", default=False,
     help='export in PHYLIP format.')
-    
+
     # Welcome message
     print("ConcatFasta v2.0")
-    
+
     args = parser.parse_args()
     if (args.dir == '.' and args.files == None):
         proceed = input("Do you which to run ConcatFasta on all files in the current directory? [y|n]")
@@ -83,7 +83,7 @@ def main():
             alnlen = list(map(lambda x: len(datalist[file][x]), datalist[file].keys()))
             if not all_same(alnlen):
                 parser.error(message="sequences are not the same length")
-            for head in datalist[file].keys(): all_labels[head] = '' 
+            for head in datalist[file].keys(): all_labels[head] = ''
             #all_labels.append(list(datalist[file].keys()))
             datalen[file] = alnlen[0]
         if not args.silent:
@@ -184,7 +184,7 @@ def readfasta(file, delim):
                     head = line[1:]
                     data[head.split(delim)[0]] = ''
                 else:
-                    data[head.split(delim)[0]] += line
+                    data[head.split(delim)[0]] += re.sub(" ","",line)
             return data
     else:
         with open(file, "r") as f:
@@ -194,7 +194,7 @@ def readfasta(file, delim):
                     head = line[1:]
                     data[head] = ''
                 else:
-                    data[head] += line
+                    data[head] += re.sub(" ","",line)
             return data
 
 def writefasta(catd, outf, wrap):
@@ -289,5 +289,3 @@ def all_same(items):
 
 if __name__ == '__main__':
     main()
-
-
