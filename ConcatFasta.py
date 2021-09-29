@@ -180,21 +180,23 @@ def readfasta(file, delim):
         with open(file, "r") as f:
             for line in f:
                 line = line.rstrip()
-                if line[0] == ">":
-                    head = line[1:]
-                    data[head.split(delim)[0]] = ''
-                else:
-                    data[head.split(delim)[0]] += re.sub(" ","",line)
+                if len(line) != 0:
+                    if line[0]:
+                        head = line[1:]
+                        data[head.split(delim)[0]] = ''
+                    else:
+                        data[head.split(delim)[0]] += re.sub(" ","",line)
             return data
     else:
         with open(file, "r") as f:
             for line in f:
                 line = line.rstrip()
-                if line[0] == ">":
-                    head = line[1:]
-                    data[head] = ''
-                else:
-                    data[head] += re.sub(" ","",line)
+                if len(line) != 0:
+                    if line[0] == ">":
+                        head = line[1:]
+                        data[head] = ''
+                    else:
+                        data[head] += re.sub(" ","",line)
             return data
 
 def writefasta(catd, outf, wrap):
